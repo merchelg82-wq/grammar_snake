@@ -50,7 +50,11 @@
     f.onsubmit=e=>{e.preventDefault();if(!c.value.trim()||!n.value.trim())return;player={className:c.value.trim(),name:n.value.trim()};safeSet(PROFILE_KEY,JSON.stringify(player));hide();let cb=pendingStart;pendingStart=null;if(cb)cb()};
     box.append(f);show();n.focus();
   }
-  window.arcadeAuthorize=function(retry){if(!player){openLogin(retry);return false}window.arcadeBegin();return true};
+  let startApproved=false;
+  window.arcadeAuthorize=function(retry){
+    if(startApproved){startApproved=false;window.arcadeBegin();return true}
+    openLogin(()=>{startApproved=true;retry()});return false;
+  };
   window.arcadeBegin=function(){sessionTopics=topicsNow();sessionActive=true};
   window.arcadeSave=function(data){if(!player||!sessionActive||!data)return false;
     const score=Number(data.score);if(!Number.isFinite(score)||score<0)return false;
